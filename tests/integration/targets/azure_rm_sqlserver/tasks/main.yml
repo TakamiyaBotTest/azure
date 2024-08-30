@@ -1,3 +1,4 @@
+---
 - name: Gather Resource Group info
   azure.azcollection.azure_rm_resourcegroup_info:
     name: "{{ resource_group }}"
@@ -8,7 +9,7 @@
     random_postfix: "{{ 1000 | random }}{{ resource_group | hash('md5') | truncate(7, True, '') }}"
     tenant_id: "{{ azure_tenant }}"
     run_azuread_tests: false
-    azuread_group_name: "Test Security Group"
+    azuread_group_name: Test Security Group
     azuread_group_id: "00000000-0000-0000-0000-000000000000"
     location: "{{ __rg_info.resourcegroups.0.location }}"
   run_once: true
@@ -24,18 +25,18 @@
       location: "{{ location }}"
     state: present
   loop:
-    - "ansible-test-sqlsvr-identity"
-    - "ansible-test-sqlsvr-identity-2"
+    - ansible-test-sqlsvr-identity
+    - ansible-test-sqlsvr-identity-2
 
 - name: Set identities IDs to test. Identities ansible-test-webapp-identity and ansible-test-webapp-identity-2 have to be created previously
   ansible.builtin.set_fact:
-    user_identity_1: "/subscriptions/{{ azure_subscription_id }}/resourcegroups/{{ resource_group }}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/ansible-test-sqlsvr-identity"
-    user_identity_2: "/subscriptions/{{ azure_subscription_id }}/resourcegroups/{{ resource_group }}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/ansible-test-sqlsvr-identity-2"
+    user_identity_1: /subscriptions/{{ azure_subscription_id }}/resourcegroups/{{ resource_group }}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/ansible-test-sqlsvr-identity
+    user_identity_2: /subscriptions/{{ azure_subscription_id }}/resourcegroups/{{ resource_group }}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/ansible-test-sqlsvr-identity-2
 
 - name: Create instance of SQL Server -- check mode
   azure_rm_sqlserver:
     resource_group: "{{ resource_group }}"
-    name: "sqlsrv{{ random_postfix }}"
+    name: sqlsrv{{ random_postfix }}
     location: eastus
     admin_username: mylogin
     admin_password: Password123!
@@ -50,7 +51,7 @@
 - name: Create instance of SQL Server
   azure_rm_sqlserver:
     resource_group: "{{ resource_group }}"
-    name: "sqlsrv{{ random_postfix }}"
+    name: sqlsrv{{ random_postfix }}
     location: eastus
     admin_username: mylogin
     admin_password: Password123!
@@ -67,7 +68,7 @@
 - name: Gather facts SQL Server
   azure_rm_sqlserver_info:
     resource_group: "{{ resource_group }}"
-    server_name: "sqlsrv{{ random_postfix }}"
+    server_name: sqlsrv{{ random_postfix }}
   register: output
 - name: Assert that SQL Server identity.type == SystemAssigned
   ansible.builtin.assert:
@@ -77,7 +78,7 @@
 - name: Create again instance of SQL Server
   azure_rm_sqlserver:
     resource_group: "{{ resource_group }}"
-    name: "sqlsrv{{ random_postfix }}"
+    name: sqlsrv{{ random_postfix }}
     location: eastus
     admin_username: mylogin
     admin_password: Password123!
@@ -92,11 +93,11 @@
 - name: Create extended instance of SQL Server
   azure_rm_sqlserver:
     resource_group: "{{ resource_group }}"
-    name: "sqlsrv-extended-{{ random_postfix }}"
+    name: sqlsrv-extended-{{ random_postfix }}
     location: eastus
     admin_username: mylogin2
     admin_password: Password123!
-    minimal_tls_version: '1.2'
+    minimal_tls_version: "1.2"
     public_network_access: Disabled
     restrict_outbound_network_access: Enabled
     primary_user_assigned_identity_id: "{{ user_identity_1 }}"
@@ -117,7 +118,7 @@
 - name: Gather facts SQL Server
   azure_rm_sqlserver_info:
     resource_group: "{{ resource_group }}"
-    server_name: "sqlsrv-extended-{{ random_postfix }}"
+    server_name: sqlsrv-extended-{{ random_postfix }}
   register: output
 - name: Assert that user_identity_1 in SQL Server
   ansible.builtin.assert:
@@ -128,11 +129,11 @@
 - name: Create extended instance of SQL Server - idempotent
   azure_rm_sqlserver:
     resource_group: "{{ resource_group }}"
-    name: "sqlsrv-extended-{{ random_postfix }}"
+    name: sqlsrv-extended-{{ random_postfix }}
     location: eastus
     admin_username: mylogin2
     admin_password: Password123!
-    minimal_tls_version: '1.2'
+    minimal_tls_version: "1.2"
     public_network_access: Disabled
     restrict_outbound_network_access: Enabled
     primary_user_assigned_identity_id: "{{ user_identity_1 }}"
@@ -153,7 +154,7 @@
 - name: Update SQL admin password
   azure_rm_sqlserver:
     resource_group: "{{ resource_group }}"
-    name: "sqlsrv-extended-{{ random_postfix }}"
+    name: sqlsrv-extended-{{ random_postfix }}
     location: eastus
     admin_password: Password123!321!
     change_admin_password: true
@@ -166,7 +167,7 @@
 - name: Create instance of SQL Server with Azure AD admin
   azure_rm_sqlserver:
     resource_group: "{{ resource_group }}"
-    name: "sqlsrv-azuread-{{ random_postfix }}"
+    name: sqlsrv-azuread-{{ random_postfix }}
     location: eastus
     admin_username: sqllogin
     admin_password: Password123!
@@ -188,7 +189,7 @@
 - name: Create instance of SQL Server with Azure AD admin - idempotent
   azure_rm_sqlserver:
     resource_group: "{{ resource_group }}"
-    name: "sqlsrv-azuread-{{ random_postfix }}"
+    name: sqlsrv-azuread-{{ random_postfix }}
     location: eastus
     admin_username: sqllogin
     admin_password: Password123!
@@ -212,7 +213,7 @@
 - name: Gather facts SQL Server
   azure_rm_sqlserver_info:
     resource_group: "{{ resource_group }}"
-    server_name: "sqlsrv{{ random_postfix }}"
+    server_name: sqlsrv{{ random_postfix }}
   register: output
 - name: Assert that facts are returned
   ansible.builtin.assert:
@@ -233,7 +234,7 @@
 - name: Gather facts for extended SQL Server
   azure_rm_sqlserver_info:
     resource_group: "{{ resource_group }}"
-    server_name: "sqlsrv-extended-{{ random_postfix }}"
+    server_name: sqlsrv-extended-{{ random_postfix }}
   register: output
 - name: Assert that facts are returned
   ansible.builtin.assert:
@@ -257,7 +258,7 @@
 - name: Gather facts for SQL Server with Azure AD admin
   azure_rm_sqlserver_info:
     resource_group: "{{ resource_group }}"
-    server_name: "sqlsrv-azuread-{{ random_postfix }}"
+    server_name: sqlsrv-azuread-{{ random_postfix }}
   register: output
   when: run_azuread_tests | bool
 - name: Assert that facts are returned
@@ -285,7 +286,7 @@
 - name: Gather facts SQL Server - unexisting
   azure_rm_sqlserver_info:
     resource_group: "{{ resource_group }}"
-    server_name: "unexisting"
+    server_name: unexisting
   register: output
 - name: Assert that facts are returned
   ansible.builtin.assert:
@@ -648,7 +649,7 @@
 - name: Create instance of Firewall Rule -- check mode
   azure_rm_sqlfirewallrule:
     resource_group: "{{ resource_group }}"
-    server_name: "sqlsrv{{ random_postfix }}"
+    server_name: sqlsrv{{ random_postfix }}
     name: firewallrule{{ random_postfix }}
     start_ip_address: 172.28.10.136
     end_ip_address: 172.28.10.138
@@ -662,7 +663,7 @@
 - name: Create instance of Firewall Rule
   azure_rm_sqlfirewallrule:
     resource_group: "{{ resource_group }}"
-    server_name: "sqlsrv{{ random_postfix }}"
+    server_name: sqlsrv{{ random_postfix }}
     name: firewallrule{{ random_postfix }}
     start_ip_address: 172.28.10.136
     end_ip_address: 172.28.10.138
@@ -675,7 +676,7 @@
 - name: Create again instance of Firewall Rule
   azure_rm_sqlfirewallrule:
     resource_group: "{{ resource_group }}"
-    server_name: "sqlsrv{{ random_postfix }}"
+    server_name: sqlsrv{{ random_postfix }}
     name: firewallrule{{ random_postfix }}
     start_ip_address: 172.28.10.136
     end_ip_address: 172.28.10.138
@@ -856,7 +857,7 @@
 - name: Delete instance of SQL Server -- check mode
   azure_rm_sqlserver:
     resource_group: "{{ resource_group }}"
-    name: "sqlsrv{{ random_postfix }}"
+    name: sqlsrv{{ random_postfix }}
     state: absent
   check_mode: true
   register: output
@@ -868,7 +869,7 @@
 - name: Delete instance of SQL Server
   azure_rm_sqlserver:
     resource_group: "{{ resource_group }}"
-    name: "sqlsrv{{ random_postfix }}"
+    name: sqlsrv{{ random_postfix }}
     state: absent
   register: output
 - name: Assert the state has changed
@@ -879,7 +880,7 @@
 - name: Delete unexisting instance of SQL Server
   azure_rm_sqlserver:
     resource_group: "{{ resource_group }}"
-    name: "sqlsrv{{ random_postfix }}"
+    name: sqlsrv{{ random_postfix }}
     state: absent
   register: output
 - name: Assert the state has changed
@@ -890,13 +891,13 @@
 - name: Delete extended instance of SQL Server
   azure_rm_sqlserver:
     resource_group: "{{ resource_group }}"
-    name: "sqlsrv-extended-{{ random_postfix }}"
+    name: sqlsrv-extended-{{ random_postfix }}
     state: absent
 
 - name: Delete instance of SQL Server with Azure AD admin
   azure_rm_sqlserver:
     resource_group: "{{ resource_group }}"
-    name: "sqlsrv-azuread-{{ random_postfix }}"
+    name: sqlsrv-azuread-{{ random_postfix }}
     state: absent
   when: run_azuread_tests | bool
 
@@ -909,5 +910,5 @@
     api_version: "2023-01-31"
     state: absent
   loop:
-    - "ansible-test-sqlsvr-identity"
-    - "ansible-test-sqlsvr-identity-2"
+    - ansible-test-sqlsvr-identity
+    - ansible-test-sqlsvr-identity-2

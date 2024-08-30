@@ -1,6 +1,7 @@
+---
 - name: Prepare random number
   ansible.builtin.set_fact:
-    set_name: "des{{ resource_group | hash('md5') | truncate(22, True, '') }}"
+    set_name: des{{ resource_group | hash('md5') | truncate(22, True, '') }}
     rpfx: "{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
     tenant_id: "{{ azure_tenant }}"
   run_once: true
@@ -16,10 +17,8 @@
 
 - name: Lookup service principal object id
   ansible.builtin.set_fact:
-    object_id: "{{ lookup('azure.azcollection.azure_service_principal_attribute',
-                   azure_client_id=azure_client_id,
-                   azure_secret=azure_secret,
-                   azure_tenant=tenant_id) }}"
+    object_id: "{{ lookup('azure.azcollection.azure_service_principal_attribute', azure_client_id=azure_client_id, azure_secret=azure_secret, azure_tenant=tenant_id)
+      }}"
   register: object_id_facts
 
 - name: Create identity and policy ids arrays
@@ -30,14 +29,13 @@
 - name: Create user managed identities
   ansible.builtin.include_tasks: managedidentity.yml
   vars:
-    managed_identity_test_unique: 'diskencryptionsets'
+    managed_identity_test_unique: diskencryptionsets
     managed_identity_unique: "{{ item }}"
-    managed_identity_action: 'create'
-    managed_identity_location: 'eastus'
+    managed_identity_action: create
+    managed_identity_location: eastus
   with_items:
-    - '1'
-    - '2'
-
+    - "1"
+    - "2"
 
 - name: Create policies keys list
   ansible.builtin.set_fact:
@@ -58,7 +56,7 @@
 - name: Create a key vault
   azure_rm_keyvault:
     resource_group: "{{ resource_group }}"
-    vault_name: "myvault{{ rpfx }}"
+    vault_name: myvault{{ rpfx }}
     enabled_for_disk_encryption: true
     vault_tenant: "{{ tenant_id }}"
     sku:
@@ -95,7 +93,7 @@
   azure_rm_diskencryptionset:
     resource_group: "{{ resource_group }}"
     name: "{{ set_name }}"
-    source_vault: "myvault{{ rpfx }}"
+    source_vault: myvault{{ rpfx }}
     key_url: "{{ key_url }}"
     state: present
   register: results
@@ -108,7 +106,7 @@
   azure_rm_diskencryptionset:
     resource_group: "{{ resource_group }}"
     name: "{{ set_name }}"
-    source_vault: "myvault{{ rpfx }}"
+    source_vault: myvault{{ rpfx }}
     key_url: "{{ key_url }}"
     state: present
   register: results
@@ -121,11 +119,11 @@
   azure_rm_diskencryptionset:
     resource_group: "{{ resource_group }}"
     name: "{{ set_name }}"
-    source_vault: "myvault{{ rpfx }}"
+    source_vault: myvault{{ rpfx }}
     key_url: "{{ key_url }}"
     state: present
     tags:
-      key1: "value1"
+      key1: value1
   register: results
 
 - name: Assert that disk encryption set is updated
@@ -153,14 +151,14 @@
   azure_rm_diskencryptionset:
     resource_group: "{{ resource_group }}"
     name: "{{ set_name }}"
-    source_vault: "myvault{{ rpfx }}"
+    source_vault: myvault{{ rpfx }}
     key_url: "{{ key_url }}"
     state: present
     identity:
       type: UserAssigned
       user_assigned_identity: "{{ managed_identity_ids[0] }}"
     tags:
-      key1: "value1"
+      key1: value1
   register: results
 
 - name: Assert that disk encryption set with first UserAssigned Identity was updated
@@ -171,14 +169,14 @@
   azure_rm_diskencryptionset:
     resource_group: "{{ resource_group }}"
     name: "{{ set_name }}"
-    source_vault: "myvault{{ rpfx }}"
+    source_vault: myvault{{ rpfx }}
     key_url: "{{ key_url }}"
     state: present
     identity:
       type: UserAssigned
       user_assigned_identity: "{{ managed_identity_ids[0] }}"
     tags:
-      key1: "value1"
+      key1: value1
   register: results
 
 - name: Assert that output is not changed (with first UserAssigned Identity)
@@ -208,14 +206,14 @@
   azure_rm_diskencryptionset:
     resource_group: "{{ resource_group }}"
     name: "{{ set_name }}"
-    source_vault: "myvault{{ rpfx }}"
+    source_vault: myvault{{ rpfx }}
     key_url: "{{ key_url }}"
     state: present
     identity:
       type: UserAssigned
       user_assigned_identity: "{{ managed_identity_ids[1] }}"
     tags:
-      key1: "value1"
+      key1: value1
   register: results
 
 - name: Assert that disk encryption set with second UserAssigned is updated
@@ -245,14 +243,14 @@
   azure_rm_diskencryptionset:
     resource_group: "{{ resource_group }}"
     name: "{{ set_name }}"
-    source_vault: "myvault{{ rpfx }}"
+    source_vault: myvault{{ rpfx }}
     key_url: "{{ key_url }}"
     state: present
     identity:
       type: SystemAssigned, UserAssigned
       user_assigned_identity: "{{ managed_identity_ids[0] }}"
     tags:
-      key1: "value1"
+      key1: value1
   register: results
 
 - name: Assert that disk encryption set with (SystemAssigned, UserAssigned) is updated
@@ -303,16 +301,16 @@
 - name: Delete the Key Vault
   azure_rm_keyvault:
     resource_group: "{{ resource_group }}"
-    vault_name: "myvault{{ rpfx }}"
+    vault_name: myvault{{ rpfx }}
     state: absent
 
 - name: Delete user managed identities
   ansible.builtin.include_tasks: managedidentity.yml
   vars:
-    managed_identity_test_unique: 'diskencryptionsets'
+    managed_identity_test_unique: diskencryptionsets
     managed_identity_unique: "{{ item }}"
-    managed_identity_action: 'delete'
-    managed_identity_location: 'eastus'
+    managed_identity_action: delete
+    managed_identity_location: eastus
   with_items:
-    - '1'
-    - '2'
+    - "1"
+    - "2"

@@ -1,10 +1,11 @@
+---
 - name: Set user managed identity name
   ansible.builtin.set_fact:
-    identity_name: "ansible-test-{{ managed_identity_test_unique }}-identity-{{ managed_identity_unique }}"
+    identity_name: ansible-test-{{ managed_identity_test_unique }}-identity-{{ managed_identity_unique }}
 
 - name: Set user managed identity ID base path
   ansible.builtin.set_fact:
-    base_path: "/subscriptions/{{ azure_subscription_id }}/resourcegroups/{{ resource_group }}"
+    base_path: /subscriptions/{{ azure_subscription_id }}/resourcegroups/{{ resource_group }}
 
 - name: Set user managed identity ID
   ansible.builtin.set_fact:

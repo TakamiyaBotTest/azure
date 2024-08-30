@@ -1,12 +1,13 @@
+---
 - name: Prepare random number
   ansible.builtin.set_fact:
-    cdnprofilename: "cdnprofile{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
-    endpointname: "endpoint{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}"
+    cdnprofilename: cdnprofile{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}
+    endpointname: endpoint{{ resource_group | hash('md5') | truncate(7, True, '') }}{{ 1000 | random }}
   run_once: true
 
 - name: Set identities base path
   ansible.builtin.set_fact:
-    identity_base_path: "/subscriptions/{{ azure_subscription_id }}/resourcegroups/{{ resource_group }}/providers/Microsoft.ManagedIdentity"
+    identity_base_path: /subscriptions/{{ azure_subscription_id }}/resourcegroups/{{ resource_group }}/providers/Microsoft.ManagedIdentity
 
 - name: Set identities IDs to test. Identities ansible-test-cdnprofile-identity and ansible-test-cdnprofile-identity-2 have to be created previously
   ansible.builtin.set_fact:
@@ -33,8 +34,8 @@
       location: "{{ location }}"
     state: present
   loop:
-    - "ansible-test-cdnprofile-identity"
-    - "ansible-test-cdnprofile-identity-2"
+    - ansible-test-cdnprofile-identity
+    - ansible-test-cdnprofile-identity-2
 
 - name: Create a CDN profile(check mode)
   azure_rm_cdnprofile:
@@ -251,7 +252,7 @@
 - name: Assert the CDN is still there
   ansible.builtin.assert:
     that:
-      - "fact.cdnprofiles | length == 1"
+      - fact.cdnprofiles | length == 1
       - fact.cdnprofiles[0].sku == 'Standard_Verizon'
       - fact.cdnprofiles[0].tags.foo == 'bar'
       - fact.cdnprofiles[0].tags.baz == 'qux'
@@ -262,8 +263,8 @@
     name: "{{ endpointname }}"
     profile_name: "{{ cdnprofilename }}"
     origins:
-      - name: "org{{ endpointname }}"
-        host_name: "www.google.com"
+      - name: org{{ endpointname }}
+        host_name: www.google.com
     tags:
       testing: testing
       delete: on-exit
@@ -276,8 +277,8 @@
     name: "{{ endpointname }}"
     profile_name: "{{ cdnprofilename }}"
     origins:
-      - name: "org{{ endpointname }}"
-        host_name: "www.google.com"
+      - name: org{{ endpointname }}
+        host_name: www.google.com
     tags:
       testing: testing
       delete: on-exit
@@ -315,8 +316,8 @@
     name: "{{ endpointname }}"
     profile_name: "{{ cdnprofilename }}"
     origins:
-      - name: "org{{ endpointname }}"
-        host_name: "www.google.com"
+      - name: org{{ endpointname }}
+        host_name: www.google.com
     tags:
       testing: testing
       delete: on-exit
@@ -420,7 +421,7 @@
 - name: Assert fact returns empty
   ansible.builtin.assert:
     that:
-      - "fact.cdnprofiles | length == 0"
+      - fact.cdnprofiles | length == 0
 
 - name: Destroy User Managed Identities
   azure_rm_resource:
@@ -431,5 +432,5 @@
     api_version: "2023-01-31"
     state: absent
   loop:
-    - "ansible-test-cdnprofile-identity"
-    - "ansible-test-cdnprofile-identity-2"
+    - ansible-test-cdnprofile-identity
+    - ansible-test-cdnprofile-identity-2
